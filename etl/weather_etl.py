@@ -31,8 +31,12 @@ def transform(city, data):
 #%% LOAD
 
 def load(weather_data):
-
-    conn = sqlite3.connect('weather.db')
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), "weather.db")
+    except:
+        db_path = os.getcwd() + '/weather.db'
+    
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -41,37 +45,46 @@ def load(weather_data):
                        city TEXT,
                        date TIMESTAMP,
                        weather TEXT,
-                       temP_celcius REAL,
+                       temp_celcius REAL,
                        humidity_percent REAL,
                        cloudiness_percent REAL                
                        )
                    
                    """)
-    
-    cursor.execute("""
-                   INSERT INTO weather_data (city, date, weather, temp_celcius, humidity_percent, cloudiness_percent)
-                   VALUES (?, ?, ?, ?, ?, ?)
-                   """,(
-                   weather_data['city'],
-                   weather_data['date'],
-                   weather_data['weather'],
-                   weather_data['temp_celcius'],
-                   weather_data['humidity_percent'],
-                   weather_data['cloudiness_percent']
-                   )
-                   )
+    try:
+        cursor.execute("""
+                       INSERT INTO weather_data (city, date, weather, temp_celcius, humidity_percent, cloudiness_percent)
+                       VALUES (?, ?, ?, ?, ?, ?)
+                       """,(
+                       weather_data['city'],
+                       weather_data['date'],
+                       weather_data['weather'],
+                       weather_data['temp_celcius'],
+                       weather_data['humidity_percent'],
+                       weather_data['cloudiness_percent']
+                       )
+                       )
+    except Exception as e:
+        print("Insert fail because: ", e)
     
     conn.commit()
     conn.close()
     
+#%% LOG TIME
+def log():
+    print(f"Recording at {datetime.now().isoformat()}")
+    
 #%% MAIN PIPELINE FUNCTION
 def run_etl():
+    print("Script starts")
+    
     api_key = os.getenv("SECRETE_KEY")
     city = 'Hanoi'
     
     raw_data = extract(city, api_key)
     cleaned_data = transform(city, raw_data)
     load(cleaned_data)
+    log()
     
 if __name__ == "__main__":
     run_etl()

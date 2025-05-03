@@ -1,0 +1,1 @@
+* */12 * * * /opt/miniconda3/envs/normal-task/bin/python3 '/Users/dungnguyen/Desktop/Data Science off/Python Programming/3. Publication/DA18_weather_data_pipeline/etl/weather_etl.py' >> '/Users/dungnguyen/Desktop/Data Science off/Python Programming/3. Publication/DA18_weather_data_pipeline/logs/weather_etl.log' 2>&1
